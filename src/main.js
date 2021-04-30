@@ -1,14 +1,5 @@
 let game;
 
-let gameOptions = {
-    groundSpeed: 350,
-    spawnRange: [100, 300],
-    groundSize: [150, 350],
-    playerGravity: 900,
-    jumpForce: 550,
-    jumps: 1
-}
-
 let gameConfig = {
     type: Phaser.AUTO,
     width: 1280,

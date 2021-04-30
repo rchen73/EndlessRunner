@@ -17,7 +17,7 @@ class Play extends Phaser.Scene {
         //this.background = this.add.tileSprite(0, 0, 1280, 720, 'background').setOrigin(0,0);
 
         this.player = this.physics.add.sprite(200, 380, "player");
-        this.player.setGravityY(gameOptions.playerGravity);
+        this.player.setGravityY(900);
         this.ghost = this.physics.add.sprite(400, 200, "ghost");
 
         spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -34,17 +34,9 @@ class Play extends Phaser.Scene {
             }
         });
 
-        this.dying = false;
-
         this.groundCollider = this.physics.add.collider(this.player, this.groundOnScreen);
 
         this.addGround(game.config.width, 300, 500);
-    }
-
-    jump() {
-        if(this.player.body.touching.down) {
-            this.player.setVelocityY(gameOptions.jumpForce * -1);
-        }
     }
 
     addGround(groundWidth, xPosition, yPosition){
@@ -58,10 +50,10 @@ class Play extends Phaser.Scene {
             ground = this.add.tileSprite(xPosition, yPosition, groundWidth, 32, "ground");
             this.physics.add.existing(ground);
             ground.body.setImmovable(true);
-            ground.body.setVelocityX(gameOptions.groundSpeed * -1);
+            ground.body.setVelocityX(-350);
             this.groundOnScreen.add(ground);
         }
-        this.nextGroundDistance = Phaser.Math.Between(gameOptions.spawnRange[0], gameOptions.spawnRange[1]);
+        this.nextGroundDistance = Phaser.Math.Between(100, 300);
     }
 
     update(){
@@ -69,7 +61,6 @@ class Play extends Phaser.Scene {
             this.jump();
         }
 
-        // game over
         if(this.player.y > game.config.height){
             this.scene.start("Play");
         }
@@ -83,7 +74,7 @@ class Play extends Phaser.Scene {
         }, this);
 
         if(minDistance > this.nextGroundDistance){
-            var nextGroundWidth = Phaser.Math.Between(gameOptions.groundSize[0], gameOptions.groundSize[1]);
+            var nextGroundWidth = Phaser.Math.Between(150, 350);
             this.addGround(nextGroundWidth, game.config.width + nextGroundWidth / 2, Phaser.Math.Between(game.config.height *0.8,
                 game.config.height * 0.6));
         }
