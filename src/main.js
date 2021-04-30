@@ -1,12 +1,11 @@
 let game;
 
 let gameOptions = {
-    platformStartSpeed: 350,
+    groundSpeed: 350,
     spawnRange: [100, 300],
-    platformSizeRange: [150, 350],
+    groundSize: [150, 350],
     playerGravity: 900,
     jumpForce: 550,
-    playerStartPosition: 200,
     jumps: 1
 }
 
