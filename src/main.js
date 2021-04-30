@@ -15,10 +15,12 @@ let gameConfig = {
     width: 1280,
     height: 720,
     scene: [Play],
-    backgroundColor: 0x000000,
+    backgroundColor: 0x444444,
     physics: {
         default: "arcade"
     }
 }
 
 game = new Phaser.Game(gameConfig);
+
+let spaceBar;
