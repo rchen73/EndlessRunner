@@ -12,7 +12,7 @@ class Title extends Phaser.Scene {
     create() {
         this.add.image(0, 0, 'titlebackground').setOrigin(0, 0);
 
-        this.titleBGM = this.sound.add('menuMusic', {volume: 0.5});
+        this.titleBGM = this.sound.add('menuMusic', {volume: 0.5, loop: true });
         this.titleBGM.play();
 
         // define keys
@@ -21,18 +21,14 @@ class Title extends Phaser.Scene {
 
     update() {
         if (Phaser.Input.Keyboard.JustDown(spaceBar)) {
+            this.titleBGM.stop();
+            /*this.tweens.add({
+                targets: this.titleBGM,
+                duration: 500,
+                volume: 0,
+                onComplete: () => this.titleBGM.stop()
+            })*/
             this.scene.start('Play');    
         }
-        /*
-        if (Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
-            // hard mode
-            game.settings = {
-                spaceshipSpeed: 4,
-                goldSpeed: 6,
-                gameTimer: 45000
-            }
-            this.sound.play('sfx_select');
-            this.scene.start('playScene');
-        }*/
     }
 }

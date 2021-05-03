@@ -16,8 +16,7 @@ class Play extends Phaser.Scene {
     create() {
         this.add.image(0, 0, 'background').setOrigin(0, 0);
 
-        this.sound.get('menuMusic').stop();
-        this.playBGM = this.sound.add('playMusic', {volume: 0.5});
+        this.playBGM = this.sound.add('playMusic', {volume: 0.5, loop: true });
         this.playBGM.play();
 
         // add player
@@ -25,7 +24,8 @@ class Play extends Phaser.Scene {
         this.player.setGravityY(900);
         this.ghost = this.physics.add.sprite(400, 200, "ghost");
 
-        spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
 
         this.ghostSpeed = -450;
         this.ghostSpeedMax = -1000;
@@ -78,8 +78,8 @@ class Play extends Phaser.Scene {
         let scoreConfig = {
             fontFamily: 'Comic Sans MS',
             fontSize: '28px',
-            backgroundColor: '#ffe100',
-            color: '#000000',
+            backgroundColor: '#000000',
+            color: '#ffffff',
             align: 'center',
             padding: {
                 top: 5,
@@ -87,7 +87,7 @@ class Play extends Phaser.Scene {
             },
             fixedWidth: 100
         }
-        this.scoreText = this.add.text(1150, 50, this.score, scoreConfig);
+        this.scoreText = this.add.text(1100, 620, this.score, scoreConfig);
 
         this.physics.add.overlap(this.player, this.candleOnScreen, function(player, candle){
             this.tweens.add({
@@ -109,21 +109,27 @@ class Play extends Phaser.Scene {
         this.ghostGroup.add(ghost);
     }
 
-    jump() {
-        if(this.player.body.touching.down) {
-            this.player.setVelocityY(-550);
+    bigJump() {
+        if (this.player.body.touching.down) {
+            this.player.setVelocityY(-600);
+        }
+    }
+
+    smallJump() {
+        if (this.player.body.touching.down) {
+            this.player.setVelocityY(-400);
         }
     }
 
     // ground creation
     addGround(groundWidth, xPosition, yPosition) {
         let ground;
-        if(this.groundSpawn.getLength()){
+        if (this.groundSpawn.getLength()) {
             ground = this.groundSpawn.getFirst();
             ground.x = xPosition;
             ground.y = yPosition;
         }
-        else{
+        else {
             ground = this.add.tileSprite(xPosition, yPosition, groundWidth, 32, "ground");
             this.physics.add.existing(ground);
             ground.body.setImmovable(true);
@@ -132,44 +138,51 @@ class Play extends Phaser.Scene {
         }
         this.nextGroundDistance = Phaser.Math.Between(100, 300);
 
-        // random candle spawn
-        if(Phaser.Math.Between(1, 100) <= 33){
-            if(this.candleSpawn.getLength()){
-                let candle = this.candleSpawn.getFirst();
-                candle.alpha = 1;
-                candle.x = xPosition;
-                candle.y = yPosition - 250;
-                this.candleSpawn.remove(candle);
+        this.time.delayedCall(3000, () => {
+            // random candle spawn
+            if (Phaser.Math.Between(1, 100) <= 50) {
+                if(this.candleSpawn.getLength()){
+                    let candle = this.candleSpawn.getFirst();
+                    candle.alpha = 1;
+                    candle.x = Phaser.Math.Between(0, xPosition);
+                    candle.y = yPosition - 310;
+                    this.candleSpawn.remove(candle);
+                }
+                else {
+                    let candle = this.physics.add.sprite(Phaser.Math.Between(0, xPosition), yPosition - 310, "candle");
+                    candle.setImmovable(true);
+                    candle.setVelocityX(ground.body.velocity.x);
+                    this.candleOnScreen.add(candle);
+                }
             }
-            else{
-                let candle = this.physics.add.sprite(xPosition, yPosition - 250, "candle");
-                candle.setImmovable(true);
-                candle.setVelocityX(ground.body.velocity.x);
-                this.candleOnScreen.add(candle);
-            }
-        }
+        });
     }
 
     update() {
         this.player.x = 200;
 
-        if(Phaser.Input.Keyboard.JustDown(spaceBar)) {
-            this.jump();
+        if (Phaser.Input.Keyboard.JustDown(keyA)) {
+            this.bigJump();
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(keyS)) {
+            this.smallJump();
         }
 
         // game over
-        if(this.player.y > game.config.height){
-            this.scene.start("Play");
+        if (this.player.y > game.config.height) {
+            this.playBGM.stop();
+            this.scene.start('GameOver');
         }
 
         let minDistance = game.config.width;
-        this.groundOnScreen.getChildren().forEach(function(ground){
+        this.groundOnScreen.getChildren().forEach(function(ground) {
             let groundDistance = game.config.width - ground.x - ground.displayWidth / 2;
             minDistance = groundDistance;
         }, this);
 
-        if(minDistance > this.nextGroundDistance){
-            var nextGroundWidth = Phaser.Math.Between(150, 350);
+        if (minDistance > this.nextGroundDistance) {
+            var nextGroundWidth = Phaser.Math.Between(175, 350);
             this.addGround(nextGroundWidth, game.config.width + nextGroundWidth / 2, Phaser.Math.Between(game.config.height *0.8,
                 game.config.height * 0.6));
         }

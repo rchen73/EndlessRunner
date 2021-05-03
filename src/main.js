@@ -10,4 +10,4 @@ let config = {
 
 let game = new Phaser.Game(config);
 
-let spaceBar, keyR, keyQ;
+let spaceBar, keyA, keyS, keyR, keyQ;
