@@ -22,12 +22,6 @@ class Title extends Phaser.Scene {
     update() {
         if (Phaser.Input.Keyboard.JustDown(spaceBar)) {
             this.titleBGM.stop();
-            /*this.tweens.add({
-                targets: this.titleBGM,
-                duration: 500,
-                volume: 0,
-                onComplete: () => this.titleBGM.stop()
-            })*/
             this.scene.start('Play');    
         }
     }

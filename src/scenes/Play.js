@@ -6,23 +6,37 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.image("ground", "./assets/ground.png");
-        this.load.image("player", "./assets/player.png");
         this.load.image("ghost", "./assets/ghost.png");
         this.load.image("candle", "./assets/candle.png");
         this.load.image('background', './assets/background.png');
+        this.load.image('candleUI', './assets/candleUI.png');
         this.load.audio('playMusic', './assets/playMusic.mp3');
+        this.load.audio('sizzle', './assets/sizzle.mp3');
+        this.load.audio('death', './assets/death.mp3');
+        this.load.spritesheet('player', './assets/player.png', {frameWidth: 70, frameHeight: 180, startFrame: 0, endFrame: 12});
     }
 
     create() {
-        this.add.image(0, 0, 'background').setOrigin(0, 0);
+        this.background = this.add.tileSprite(0, 0, 1280, 720, 'background').setOrigin(0,0);
+        this.add.image(50, 50, 'candleUI').setOrigin(0, 0);
 
         this.playBGM = this.sound.add('playMusic', {volume: 0.5, loop: true });
         this.playBGM.play();
 
         // add player
+        //this.player = this.physics.add.sprite(200, 380, "player");
         this.player = this.physics.add.sprite(200, 380, "player");
         this.player.setGravityY(900);
         this.ghost = this.physics.add.sprite(400, 200, "ghost");
+
+        this.anims.create({
+            key: 'move',
+            frames: this.anims.generateFrameNumbers('player', {start: 0, end: 12, first: 0}),
+            frameRate: 20,
+            repeat: -1
+        });
+
+        this.player.anims.play('move');
 
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
@@ -66,7 +80,6 @@ class Play extends Phaser.Scene {
             }
         });
 
-        // player touches the ground
         this.touchGround = this.physics.add.collider(this.player, this.groundOnScreen);
 
         this.addGround(game.config.width, 300, 500);
@@ -78,26 +91,22 @@ class Play extends Phaser.Scene {
         let scoreConfig = {
             fontFamily: 'Comic Sans MS',
             fontSize: '28px',
-            backgroundColor: '#000000',
-            color: '#ffffff',
+            color: '#ff0000',
             align: 'center',
-            padding: {
-                top: 5,
-                bottom: 5
-            },
             fixedWidth: 100
         }
-        this.scoreText = this.add.text(1100, 620, this.score, scoreConfig);
+        this.scoreText = this.add.text(180, 55, this.score, scoreConfig);
 
         this.physics.add.overlap(this.player, this.candleOnScreen, function(player, candle){
+            this.sound.play('sizzle');
             this.tweens.add({
                 targets: candle,
                 alpha: 0,
-                duration: 100,
+                duration: 100
             });
             this.candleOnScreen.kill(candle);
             this.candleOnScreen.remove(candle);
-            this.score += 10;
+            this.score += 1;
             this.scoreText.text = this.score;
         }, null, this);
     }
@@ -124,6 +133,8 @@ class Play extends Phaser.Scene {
     // ground creation
     addGround(groundWidth, xPosition, yPosition) {
         let ground;
+        let velocity = -350;
+
         if (this.groundSpawn.getLength()) {
             ground = this.groundSpawn.getFirst();
             ground.x = xPosition;
@@ -133,9 +144,10 @@ class Play extends Phaser.Scene {
             ground = this.add.tileSprite(xPosition, yPosition, groundWidth, 32, "ground");
             this.physics.add.existing(ground);
             ground.body.setImmovable(true);
-            ground.body.setVelocityX(-350);
+            ground.body.setVelocityX(velocity);
             this.groundOnScreen.add(ground);
         }
+
         this.nextGroundDistance = Phaser.Math.Between(100, 300);
 
         this.time.delayedCall(3000, () => {
@@ -159,6 +171,8 @@ class Play extends Phaser.Scene {
     }
 
     update() {
+        this.background.tilePositionX += 1;
+
         this.player.x = 200;
 
         if (Phaser.Input.Keyboard.JustDown(keyA)) {
@@ -172,6 +186,7 @@ class Play extends Phaser.Scene {
         // game over
         if (this.player.y > game.config.height) {
             this.playBGM.stop();
+            this.sound.play('death');
             this.scene.start('GameOver');
         }
 

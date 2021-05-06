@@ -1,3 +1,15 @@
+/*
+Names: Ryan Chen
+       Zhe Kou
+       Chun Yin Chu
+
+Game Title: Onryo
+
+Date Completed:
+
+Creative Tilt: I'm proud of
+*/
+
 let config = {
     type: Phaser.AUTO,
     width: 1280,
