@@ -5,9 +5,11 @@ Names: Ryan Chen
 
 Game Title: Onryo
 
-Date Completed:
+Date Completed: May 7, 2021
 
-Creative Tilt: I'm proud of
+Creative Tilt: I'm proud of creating the randomized ground that the player collides with in order to stay alive
+               and continue running for their life. The horror visual and audio style of the game adds on to the
+               idea of having the player endlessly running. Every design in the game is matching with each other.
 */
 
 let config = {

@@ -18,16 +18,14 @@ class Play extends Phaser.Scene {
 
     create() {
         this.background = this.add.tileSprite(0, 0, 1280, 720, 'background').setOrigin(0,0);
-        this.add.image(50, 50, 'candleUI').setOrigin(0, 0);
+        this.add.image(50, 50, 'candleUI').setOrigin(0, 0).setDepth(2);
 
         this.playBGM = this.sound.add('playMusic', {volume: 0.5, loop: true });
         this.playBGM.play();
 
         // add player
-        //this.player = this.physics.add.sprite(200, 380, "player");
         this.player = this.physics.add.sprite(200, 380, "player");
         this.player.setGravityY(900);
-        this.ghost = this.physics.add.sprite(400, 200, "ghost");
 
         this.anims.create({
             key: 'move',
@@ -38,19 +36,17 @@ class Play extends Phaser.Scene {
 
         this.player.anims.play('move');
 
+        let ghosts = this.physics.add.group();
+        var ghost = ghosts.create(50, 50, 'ghost');
+        ghost.setBounce(1);
+        ghost.setCollideWorldBounds(true);
+        ghost.setVelocityY(200);
+        ghost.setDepth(1);
+
+        // define keys
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
 
-        this.ghostSpeed = -450;
-        this.ghostSpeedMax = -1000;
-
-        // set up barrier group
-        this.ghostGroup = this.add.group({
-            runChildUpdate: true    // make sure update runs on group children
-        });
-        this.time.delayedCall(2500, () => {
-            this.addGhost();
-        });
 
         // visible ground
         this.groundOnScreen = this.add.group({
@@ -96,6 +92,7 @@ class Play extends Phaser.Scene {
             fixedWidth: 100
         }
         this.scoreText = this.add.text(180, 55, this.score, scoreConfig);
+        this.scoreText.setDepth(1);
 
         this.physics.add.overlap(this.player, this.candleOnScreen, function(player, candle){
             this.sound.play('sizzle');
@@ -111,13 +108,6 @@ class Play extends Phaser.Scene {
         }, null, this);
     }
 
-    // create new barriers and add them to existing barrier group
-    addGhost() {
-        let speedVariance =  Phaser.Math.Between(0, 50);
-        let ghost = new Ghost(this, this.ghostSpeed - speedVariance);
-        this.ghostGroup.add(ghost);
-    }
-
     bigJump() {
         if (this.player.body.touching.down) {
             this.player.setVelocityY(-600);
@@ -130,7 +120,6 @@ class Play extends Phaser.Scene {
         }
     }
 
-    // ground creation
     addGround(groundWidth, xPosition, yPosition) {
         let ground;
         let velocity = -350;
